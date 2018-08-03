@@ -9,8 +9,8 @@
 　（ https://github.com/kaityo256/mdstep ）を参考にさせて頂いています。
 　ビルドには、以下のライブラリが必要です。
 　・Boost C++ Libraries
-　・DirectX SDK (June 2010)
 　・Eigen
+　・Intel® Threading Building Blocks (Intel® TBB)
 
 ★更新履歴
 　2018/8/3    ver.0.1　公開。
@@ -117,5 +117,9 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 * DEALINGS IN THE SOFTWARE.
 */
 
-  LJ_Argon_MD2にはEigen projectによるEigenを使用しています。
+  LJ_Argon_MD_Drirect3D_11にはEigen projectによるEigenを使用しています。
 　こちらのライセンスは MPL2 になります。
+
+  LJ_Argon_MD_Drirect3D_11にはIntel CorporationによるIntel® Threading Building
+　Blocks(Intel® TBB)を使用しています。
+  こちらのライセンスは GNU General Public License, version 2 になります。
