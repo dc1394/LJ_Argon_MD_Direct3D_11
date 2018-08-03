@@ -6,12 +6,8 @@
 // applications should avoid this file format in favor of a destination format that 
 // meets the specific needs of the application.
 //
-// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
-// ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
-// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
-// PARTICULAR PURPOSE.
-//
 // Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 //
 // http://go.microsoft.com/fwlink/?LinkId=320437
 //--------------------------------------------------------------------------------------
@@ -704,22 +700,33 @@ void CDXUTSDKMesh::RenderFrame( UINT iFrame,
 }
 
 //--------------------------------------------------------------------------------------
-CDXUTSDKMesh::CDXUTSDKMesh() : m_NumOutstandingResources( 0 ),
-                               m_bLoading( false ),
-                               m_hFile( 0 ),
-                               m_hFileMappingObject( 0 ),
-                               m_pMeshHeader( nullptr ),
-                               m_pStaticMeshData( nullptr ),
-                               m_pHeapData( nullptr ),
-                               m_pAdjacencyIndexBufferArray( nullptr ),
-                               m_pAnimationData( nullptr ),
-                               m_pAnimationHeader( nullptr ),
-                               m_ppVertices( nullptr ),
-                               m_ppIndices( nullptr ),
-                               m_pBindPoseFrameMatrices( nullptr ),
-                               m_pTransformedFrameMatrices( nullptr ),
-                               m_pWorldPoseFrameMatrices( nullptr ),
-                               m_pDev11( nullptr )
+CDXUTSDKMesh::CDXUTSDKMesh() noexcept :
+    m_NumOutstandingResources(0),
+    m_bLoading(false),
+    m_hFile(0),
+    m_hFileMappingObject(0),
+    m_pDev11(nullptr),
+    m_pDevContext11(nullptr),
+    m_pStaticMeshData(nullptr),
+    m_pHeapData(nullptr),
+    m_pAnimationData(nullptr),
+    m_ppVertices(nullptr),
+    m_ppIndices(nullptr),
+    m_strPathW{},
+    m_strPath{},
+    m_pMeshHeader(nullptr),
+    m_pVertexBufferArray(nullptr),
+    m_pIndexBufferArray(nullptr),
+    m_pMeshArray(nullptr),
+    m_pSubsetArray(nullptr),
+    m_pFrameArray(nullptr),
+    m_pMaterialArray(nullptr),
+    m_pAdjacencyIndexBufferArray(nullptr),
+    m_pAnimationHeader(nullptr),
+    m_pAnimationFrameData(nullptr),
+    m_pBindPoseFrameMatrices(nullptr),
+    m_pTransformedFrameMatrices(nullptr),
+    m_pWorldPoseFrameMatrices(nullptr)
 {
 }
 

@@ -3,12 +3,8 @@
 //
 // Dialog for selection of device settings 
 //
-// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
-// ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
-// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
-// PARTICULAR PURPOSE.
-//
 // Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 //
 // http://go.microsoft.com/fwlink/?LinkId=320437
 //--------------------------------------------------------------------------------------
@@ -40,9 +36,13 @@ CD3DSettingsDlg* WINAPI DXUTGetD3DSettingsDialog()
 
 
 //--------------------------------------------------------------------------------------
-CD3DSettingsDlg::CD3DSettingsDlg() :
+CD3DSettingsDlg::CD3DSettingsDlg() noexcept :
+    m_pActiveDialog(nullptr),
+    m_Dialog{},
+    m_nRevertModeTimeout(0),
+    m_nIDEvent(0),
     m_bActive( false ),
-    m_pActiveDialog( nullptr )
+    m_Levels{}
 {
     m_Levels[0] = D3D_FEATURE_LEVEL_9_1;
     m_Levels[1] = D3D_FEATURE_LEVEL_9_2;
@@ -54,6 +54,9 @@ CD3DSettingsDlg::CD3DSettingsDlg() :
 #if defined(USE_DIRECT3D11_3) || defined(USE_DIRECT3D11_4) 
     m_Levels[7] = D3D_FEATURE_LEVEL_12_0;
     m_Levels[8] = D3D_FEATURE_LEVEL_12_1;
+#else
+    m_Levels[7] = static_cast<D3D_FEATURE_LEVEL>(0xc000);
+    m_Levels[8] = static_cast<D3D_FEATURE_LEVEL>(0xc100);
 #endif
 }
 

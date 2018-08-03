@@ -13,12 +13,11 @@
 #include "DXUT.h"
 #include "DXUTcamera.h"
 #include "DXUTgui.h"
-#include "DXUTsettingsDlg.h"
+#include "DXUTsettingsdlg.h"
 #include "moleculardynamics/Ar_moleculardynamics.h"
 #include "SDKmesh.h"
 #include "SDKmisc.h"
 #include <array>					// for std::array
-#include <boost/assert.hpp>         // for BOOST_ASSERT
 #include <boost/cast.hpp>           // for boost::numeric_cast
 #include <boost/format.hpp>			// for boost::wformat
 #include <boost/utility.hpp>		// for boost::checked_delete
@@ -274,7 +273,11 @@ HRESULT RenderBox(ID3D11Device* pd3dDevice);
 //! A function.
 /*!
 	箱を描画する
-	\param pd3dDevice Direct3Dのデバイス
+	\param pd3dImmediateContext Direct3Dのデバイスコンテキスト
+    \param x 箱を描画するx座標
+    \param y 箱を描画するy座標
+    \param z 箱を描画するz座標
+    \param color 箱の線の色
 */
 HRESULT RenderSphere(ID3D11DeviceContext* pd3dImmediateContext, float x, float y, float z, XMFLOAT4 const color);
 
@@ -365,7 +368,7 @@ HRESULT CALLBACK OnD3D11CreateDevice( ID3D11Device* pd3dDevice, const DXGI_SURFA
 	V_RETURN(settingsDlg.OnD3D11CreateDevice(pd3dDevice));
 	pTxtHelper.reset(new CDXUTTextHelper(pd3dDevice, pd3dImmediateContext, &dialogResourceManager, 15));
 
-    DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
+    DWORD const dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
 #ifdef _DEBUG
     // Set the D3DCOMPILE_DEBUG flag to embed debug information in the shaders.
     // Setting this flag improves the shader debugging experience, but still allows 
@@ -563,9 +566,8 @@ void CALLBACK OnD3D11FrameRender(ID3D11Device* pd3dDevice, ID3D11DeviceContext* 
 	auto const mWorldViewProjection = mWorld * mView * mProj;
 
 	// Update constant buffer that changes once per frame
-	HRESULT hr;
 	D3D11_MAPPED_SUBRESOURCE MappedResource;
-	V(pd3dImmediateContext->Map(pCBChangesEveryFrame_Box.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedResource));
+    auto const hr = pd3dImmediateContext->Map(pCBChangesEveryFrame_Box.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedResource);
 	auto pCB = reinterpret_cast<CBChangesEveryFrame*>(MappedResource.pData);
 	XMStoreFloat4x4(&pCB->mWorld, XMMatrixTranspose(mWorld));
 	XMStoreFloat4x4(&pCB->mView, XMMatrixTranspose(mView));
@@ -737,6 +739,9 @@ void CALLBACK OnKeyboard( UINT nChar, bool bKeyDown, bool bAltDown, void* pUserC
         {
             case VK_F1: // Change as needed                
                 break;
+
+            default:
+                break;
         }
     }
 }
@@ -852,7 +857,7 @@ HRESULT RenderSphere(ID3D11DeviceContext* pd3dImmediateContext, float x, float y
 	{
 		auto const pSubset = mesh.GetSubset(0, subset);
 
-		auto const PrimType = mesh.GetPrimitiveType11(static_cast<SDKMESH_PRIMITIVE_TYPE>(pSubset->PrimitiveType));
+		auto const PrimType = CDXUTSDKMesh::GetPrimitiveType11(static_cast<SDKMESH_PRIMITIVE_TYPE>(pSubset->PrimitiveType));
 		pd3dImmediateContext->IASetPrimitiveTopology(PrimType);
 
 		// Ignores most of the material information in them mesh to use only a simple shader

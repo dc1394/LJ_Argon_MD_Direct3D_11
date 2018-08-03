@@ -1,12 +1,8 @@
 //--------------------------------------------------------------------------------------
 // File: ImeUi.cpp
 //
-// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
-// ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
-// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
-// PARTICULAR PURPOSE.
-//
 // Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 //
 // http://go.microsoft.com/fwlink/?LinkId=320437
 //--------------------------------------------------------------------------------------
@@ -128,14 +124,15 @@ FAR*                            LPINPUTCONTEXT2;
 class CDisableCicero
 {
 public:
-            CDisableCicero() : m_ptim( nullptr ),
-                               m_bComInit( false )
-            {
-            }
-            ~CDisableCicero()
-            {
-                Uninitialize();
-            }
+    CDisableCicero() noexcept :
+        m_ptim( nullptr ),
+        m_bComInit( false )
+    {}
+    ~CDisableCicero()
+    {
+        Uninitialize();
+    }
+
     void    Initialize()
     {
         if( m_bComInit )
@@ -352,7 +349,7 @@ protected:
                            public ITfCompartmentEventSink
     {
     public:
-        CUIElementSink();
+        CUIElementSink() noexcept;
         virtual ~CUIElementSink();
 
         // IUnknown
@@ -397,9 +394,7 @@ protected:
     static CUIElementSink* m_TsfSink;
     static int m_nCandidateRefCount;	// Some IME shows multiple candidate lists but the Library doesn't support multiple candidate list. 
     // So track open / close events to make sure the candidate list opened last is shown.
-                CTsfUiLessMode()
-                {
-                }	// this class can't be instanciated
+    CTsfUiLessMode() = default; // this class can't be instanciated
 
 public:
     static BOOL SetupSinks();
@@ -2680,9 +2675,8 @@ void CTsfUiLessMode::ReleaseSinks()
     }	
 }
 
-CTsfUiLessMode::CUIElementSink::CUIElementSink()
+CTsfUiLessMode::CUIElementSink::CUIElementSink() noexcept : _cRef(1)
 {
-    _cRef = 1;
 }
 
 

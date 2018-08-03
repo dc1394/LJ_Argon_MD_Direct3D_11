@@ -3,12 +3,8 @@
 //
 // Enumerates D3D adapters, devices, modes, etc.
 //
-// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
-// ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
-// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
-// PARTICULAR PURPOSE.
-//
 // Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 //
 // http://go.microsoft.com/fwlink/?LinkId=320437
 //--------------------------------------------------------------------------------------
@@ -42,7 +38,7 @@ void WINAPI DXUTDestroyD3D11Enumeration()
 class DXUTMemoryHelperD3D11Enum
 {
 public:
-DXUTMemoryHelperD3D11Enum() { DXUTCreateD3D11Enumeration(); }
+DXUTMemoryHelperD3D11Enum() noexcept { DXUTCreateD3D11Enumeration(); }
 ~DXUTMemoryHelperD3D11Enum() { DXUTDestroyD3D11Enumeration(); }
 };
 
@@ -69,7 +65,7 @@ CD3D11Enumeration* WINAPI DXUTGetD3D11Enumeration( bool bForceEnumerate, bool bE
 
 
 //--------------------------------------------------------------------------------------
-CD3D11Enumeration::CD3D11Enumeration() :
+CD3D11Enumeration::CD3D11Enumeration() noexcept :
     m_bHasEnumerated(false),
     m_IsD3D11DeviceAcceptableFunc(nullptr),
     m_pIsD3D11DeviceAcceptableFuncUserContext(nullptr),
