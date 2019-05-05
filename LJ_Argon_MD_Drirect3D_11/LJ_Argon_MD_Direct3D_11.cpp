@@ -563,7 +563,6 @@ void CALLBACK OnD3D11FrameRender(ID3D11Device* pd3dDevice, ID3D11DeviceContext* 
 
 	// Set the per object constant data
 	auto const mWorld = camera.GetWorldMatrix();
-	auto const mWorldViewProjection = mWorld * mView * mProj;
 
 	// Update constant buffer that changes once per frame
 	D3D11_MAPPED_SUBRESOURCE MappedResource;
