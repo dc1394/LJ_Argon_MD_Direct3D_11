@@ -368,7 +368,7 @@ HRESULT CALLBACK OnD3D11CreateDevice( ID3D11Device* pd3dDevice, const DXGI_SURFA
 	V_RETURN(settingsDlg.OnD3D11CreateDevice(pd3dDevice));
 	pTxtHelper.reset(new CDXUTTextHelper(pd3dDevice, pd3dImmediateContext, &dialogResourceManager, 15));
 
-    DWORD const dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
+    DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
 #ifdef _DEBUG
     // Set the D3DCOMPILE_DEBUG flag to embed debug information in the shaders.
     // Setting this flag improves the shader debugging experience, but still allows 
