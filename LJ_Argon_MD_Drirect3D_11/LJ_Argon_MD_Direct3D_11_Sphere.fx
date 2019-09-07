@@ -19,14 +19,13 @@ cbuffer cbChangesEveryFrame : register( b1 )
 {
     matrix WorldViewProj;
     matrix World;
-	float4 vMeshColor;
+    float4 vMeshColor;
 };
 
 struct VS_INPUT
 {
     float3 Pos          : POSITION;         // position
     float3 Norm         : NORMAL;           // normal
-    float2 Tex          : TEXCOORD0;        // texture coordinate
 };
 
 struct PS_INPUT
@@ -45,10 +44,10 @@ PS_INPUT VS( VS_INPUT input )
     output.Pos = mul( float4(input.Pos,1), WorldViewProj );
     float3 vNormalWorldSpace = normalize( mul( input.Norm, (float3x3)World ) );
 
-	float fLightAmbient = 0.45f;
+    float fLightAmbient = 0.45f;
     float fLighting = saturate( dot( vNormalWorldSpace, vLightDir ) ) + fLightAmbient;
-	float fThreshold = 0.75f;
-	output.Diffuse.rgb = fLighting > fThreshold ? fThreshold : fLighting;
+    float fThreshold = 0.75f;
+    output.Diffuse.rgb = fLighting > fThreshold ? fThreshold : fLighting;
     output.Diffuse.a = 1.0f; 
 
     return output;

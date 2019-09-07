@@ -213,13 +213,13 @@ Microsoft::WRL::ComPtr<ID3D11InputLayout> pVertexLayout;
 
 //! A global variable.
 /*!
-	バーテックスシェーダー
+	バーテックスシェーダー（箱）
 */
 Microsoft::WRL::ComPtr<ID3D11VertexShader> pVertexShaderBox;
 
 //! A global variable.
 /*!
-バーテックスシェーダー
+	バーテックスシェーダー（球）
 */
 Microsoft::WRL::ComPtr<ID3D11VertexShader> pVertexShaderSphere;
 
@@ -391,6 +391,20 @@ HRESULT CALLBACK OnD3D11CreateDevice( ID3D11Device* pd3dDevice, const DXGI_SURFA
         return hr;
     }
 
+	// Define the input layout
+	std::array<D3D11_INPUT_ELEMENT_DESC, 2> layout =
+	{
+		"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0,
+		"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0
+	};
+
+	// Create the input layout
+	hr = pd3dDevice->CreateInputLayout(layout.data(), static_cast<UINT>(layout.size()), pVSBlob->GetBufferPointer(),
+		pVSBlob->GetBufferSize(), pVertexLayout.GetAddressOf());
+	
+	// Set the input layout
+	pd3dImmediateContext->IASetInputLayout(pVertexLayout.Get());
+
 	Microsoft::WRL::ComPtr<ID3DBlob> pVSBlob2;
 	V_RETURN(DXUTCompileFromFile(L"LJ_Argon_MD_Direct3D_11_Sphere.fx", nullptr, "VS", "vs_4_0", dwShaderFlags, 0, pVSBlob2.GetAddressOf()));
 
@@ -402,15 +416,14 @@ HRESULT CALLBACK OnD3D11CreateDevice( ID3D11Device* pd3dDevice, const DXGI_SURFA
 	}
 
     // Define the input layout
-    std::array<D3D11_INPUT_ELEMENT_DESC, 3> layout =
+    std::array<D3D11_INPUT_ELEMENT_DESC, 2> layout2 =
     {
         "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0,
-		"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0,
-		"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0
+		"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0
     };
 
     // Create the input layout
-    hr = pd3dDevice->CreateInputLayout( layout.data(), static_cast<UINT>(layout.size()), pVSBlob2->GetBufferPointer(),
+    hr = pd3dDevice->CreateInputLayout( layout2.data(), static_cast<UINT>(layout2.size()), pVSBlob2->GetBufferPointer(),
                                         pVSBlob2->GetBufferSize(), pVertexLayout.GetAddressOf() );
     pVSBlob2.Reset();
 	if (FAILED(hr)) {
