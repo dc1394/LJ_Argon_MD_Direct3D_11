@@ -190,7 +190,7 @@ Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShaderBox;
 
 //! A global variable.
 /*!
-ピクセルシェーダー
+	ピクセルシェーダー
 */
 Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShaderSphere;
 
@@ -234,6 +234,8 @@ CD3DSettingsDlg settingsDlg;
 	dialog for specific controls
 */
 CDXUTDialog ui;
+
+D3D11_VIEWPORT          m_Viewport;
 
 
 //--------------------------------------------------------------------------------------
@@ -394,8 +396,8 @@ HRESULT CALLBACK OnD3D11CreateDevice( ID3D11Device* pd3dDevice, const DXGI_SURFA
 	// Define the input layout
 	std::array<D3D11_INPUT_ELEMENT_DESC, 2> layout =
 	{
-		"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0,
-		"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0
+		"POSITION0", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0,
+		"COLOR0", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0
 	};
 
 	// Create the input layout
@@ -418,7 +420,7 @@ HRESULT CALLBACK OnD3D11CreateDevice( ID3D11Device* pd3dDevice, const DXGI_SURFA
     // Define the input layout
     std::array<D3D11_INPUT_ELEMENT_DESC, 2> layout2 =
     {
-        "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0,
+        "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0,
 		"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0
     };
 
@@ -474,25 +476,16 @@ HRESULT CALLBACK OnD3D11CreateDevice( ID3D11Device* pd3dDevice, const DXGI_SURFA
     // Set primitive topology
     pd3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
-    // Create the constant buffers
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd, sizeof(bd));
 	bd.Usage = D3D11_USAGE_DYNAMIC;
 	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    bd.ByteWidth = sizeof(CBChangesEveryFrame);
-    V_RETURN( pd3dDevice->CreateBuffer( &bd, nullptr, pCBChangesEveryFrame_Box.GetAddressOf() ) );
+	bd.ByteWidth = sizeof(CBChangesEveryFrame);
+	V_RETURN(pd3dDevice->CreateBuffer(&bd, nullptr, pCBChangesEveryFrame_Sphere.GetAddressOf()));
 
-	D3D11_BUFFER_DESC bd2;
-	ZeroMemory(&bd2, sizeof(bd2));
-	bd2.Usage = D3D11_USAGE_DYNAMIC;
-	bd2.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	bd2.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	bd2.ByteWidth = sizeof(CBChangesEveryFrame2);
-	V_RETURN(pd3dDevice->CreateBuffer(&bd2, nullptr, pCBChangesEveryFrame_Sphere.GetAddressOf()));
-
-	bd2.ByteWidth = sizeof(CBNeverChanges);
-	V_RETURN(pd3dDevice->CreateBuffer(&bd2, nullptr, pCBNeverChanges.GetAddressOf()));
+	bd.ByteWidth = sizeof(CBNeverChanges);
+	V_RETURN(pd3dDevice->CreateBuffer(&bd, nullptr, pCBNeverChanges.GetAddressOf()));
 
 	D3D11_MAPPED_SUBRESOURCE MappedResource;
 	V(pd3dImmediateContext->Map(pCBNeverChanges.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedResource));
@@ -526,7 +519,7 @@ void CALLBACK OnD3D11DestroyDevice(void* pUserContext)
 	pVertexBuffer.Reset();
 	pPixelShaderSphere.Reset();
 	pPixelShaderBox.Reset();
-	SAFE_DELETE(pIndexBuffer);
+	SAFE_RELEASE(pIndexBuffer);
 	pCBNeverChanges.Reset();
 	pCBChangesEveryFrame_Sphere.Reset();
 	pCBChangesEveryFrame_Box.Reset();
@@ -579,12 +572,12 @@ void CALLBACK OnD3D11FrameRender(ID3D11Device* pd3dDevice, ID3D11DeviceContext* 
 
 	// Update constant buffer that changes once per frame
 	D3D11_MAPPED_SUBRESOURCE MappedResource;
-    auto const hr = pd3dImmediateContext->Map(pCBChangesEveryFrame_Box.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedResource);
+    auto const hr = pd3dImmediateContext->Map(pCBChangesEveryFrame_Sphere.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedResource);
 	auto pCB = reinterpret_cast<CBChangesEveryFrame*>(MappedResource.pData);
 	XMStoreFloat4x4(&pCB->mWorld, XMMatrixTranspose(mWorld));
 	XMStoreFloat4x4(&pCB->mView, XMMatrixTranspose(mView));
 	XMStoreFloat4x4(&pCB->mProjection, XMMatrixTranspose(mProj));
-	pd3dImmediateContext->Unmap(pCBChangesEveryFrame_Box.Get(), 0);
+	pd3dImmediateContext->Unmap(pCBChangesEveryFrame_Sphere.Get(), 0);
 
 	// Set vertex buffer
 	UINT const stride = sizeof(SimpleVertex);
@@ -598,14 +591,16 @@ void CALLBACK OnD3D11FrameRender(ID3D11Device* pd3dDevice, ID3D11DeviceContext* 
 	pd3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
 	//
-	// Render the cube
+	// 箱の描画
 	//
 	pd3dImmediateContext->VSSetShader(pVertexShaderBox.Get(), nullptr, 0);
 	pd3dImmediateContext->VSSetConstantBuffers(0, 1, pCBChangesEveryFrame_Box.GetAddressOf());
-	pd3dImmediateContext->PSSetShader(pPixelShaderBox.Get(), nullptr, 0);
-	pd3dImmediateContext->PSSetConstantBuffers(0, 1, pCBChangesEveryFrame_Box.GetAddressOf());
-	pd3dImmediateContext->DrawIndexed(NUMINDEXBUFFER, 0, 0);
 
+	pd3dImmediateContext->PSSetShader(pPixelShaderBox.Get(), nullptr, 0);
+	pd3dImmediateContext->PSSetConstantBuffers(1, 1, pCBChangesEveryFrame_Box.GetAddressOf());
+
+	pd3dImmediateContext->DrawIndexed(NUMINDEXBUFFER, 0, 0);
+	
 	auto const pos = boost::numeric_cast<float>(armd.periodiclen()) * 0.5f;
 	auto const size = armd.Atoms().size();
 
@@ -837,12 +832,12 @@ HRESULT RenderSphere(ID3D11DeviceContext* pd3dImmediateContext, float x, float y
 
 	// Update constant buffer that changes once per frame
 	D3D11_MAPPED_SUBRESOURCE MappedResource;
-	V(pd3dImmediateContext->Map(pCBChangesEveryFrame_Box.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedResource));
+	V(pd3dImmediateContext->Map(pCBChangesEveryFrame_Sphere.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedResource));
 	auto pCB = reinterpret_cast<CBChangesEveryFrame2*>(MappedResource.pData);
 	XMStoreFloat4x4(&pCB->mWorldViewProj, XMMatrixTranspose(mWorldViewProjection));
 	XMStoreFloat4x4(&pCB->mWorld, XMMatrixTranspose(mworld));
 	pCB->vMeshColor = color;
-	pd3dImmediateContext->Unmap(pCBChangesEveryFrame_Box.Get(), 0);
+	pd3dImmediateContext->Unmap(pCBChangesEveryFrame_Sphere.Get(), 0);
 
 	//
 	// Set the Vertex Layout
@@ -859,11 +854,10 @@ HRESULT RenderSphere(ID3D11DeviceContext* pd3dImmediateContext, float x, float y
 	pd3dImmediateContext->IASetIndexBuffer(mesh.GetIB11(0), mesh.GetIBFormat11(0), 0);
 
 	pd3dImmediateContext->VSSetShader(pVertexShaderSphere.Get(), nullptr, 0);
-	pd3dImmediateContext->VSSetConstantBuffers(0, 1, pCBNeverChanges.GetAddressOf());
-	pd3dImmediateContext->VSSetConstantBuffers(1, 1, pCBChangesEveryFrame_Box.GetAddressOf());
+	pd3dImmediateContext->VSSetConstantBuffers(1, 1, pCBChangesEveryFrame_Sphere.GetAddressOf());
 
 	pd3dImmediateContext->PSSetShader(pPixelShaderSphere.Get(), nullptr, 0);
-	pd3dImmediateContext->PSSetConstantBuffers(1, 1, pCBChangesEveryFrame_Box.GetAddressOf());
+	pd3dImmediateContext->PSSetConstantBuffers(1, 1, pCBChangesEveryFrame_Sphere.GetAddressOf());
 
 	for (auto subset = 0U; subset < mesh.GetNumSubsets(0); ++subset)
 	{
