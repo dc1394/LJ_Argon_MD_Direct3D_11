@@ -180,17 +180,17 @@ Microsoft::WRL::ComPtr<ID3D11Buffer> pCBNeverChanges;
 /*!
 	インデックスバッファ
 */
-ID3D11Buffer* pIndexBuffer;
+Microsoft::WRL::ComPtr<ID3D11Buffer> pIndexBuffer;
 
 //! A global variable.
 /*!
-	ピクセルシェーダー
+	ピクセルシェーダー（箱）
 */
 Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShaderBox;
 
 //! A global variable.
 /*!
-	ピクセルシェーダー
+	ピクセルシェーダー（球）
 */
 Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShaderSphere;
 
@@ -471,7 +471,7 @@ HRESULT CALLBACK OnD3D11CreateDevice( ID3D11Device* pd3dDevice, const DXGI_SURFA
 	pd3dImmediateContext->IASetVertexBuffers(0, 1, pVertexBuffer.GetAddressOf(), &stride, &offset);
 
     // Set index buffer
-    pd3dImmediateContext->IASetIndexBuffer( pIndexBuffer, DXGI_FORMAT_R32_UINT, 0 );
+    pd3dImmediateContext->IASetIndexBuffer( pIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0 );
 
     // Set primitive topology
     pd3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
@@ -519,7 +519,7 @@ void CALLBACK OnD3D11DestroyDevice(void* pUserContext)
 	pVertexBuffer.Reset();
 	pPixelShaderSphere.Reset();
 	pPixelShaderBox.Reset();
-	SAFE_RELEASE(pIndexBuffer);
+	pIndexBuffer.Reset();
 	pCBNeverChanges.Reset();
 	pCBChangesEveryFrame_Sphere.Reset();
 	pCBChangesEveryFrame_Box.Reset();
@@ -585,7 +585,7 @@ void CALLBACK OnD3D11FrameRender(ID3D11Device* pd3dDevice, ID3D11DeviceContext* 
 	pd3dImmediateContext->IASetVertexBuffers(0, 1, pVertexBuffer.GetAddressOf(), &stride, &offset);
 
 	// Set index buffer
-	pd3dImmediateContext->IASetIndexBuffer(pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	pd3dImmediateContext->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 	// Set primitive topology
 	pd3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
