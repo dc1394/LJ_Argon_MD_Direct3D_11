@@ -10,10 +10,7 @@
 
 #pragma once
 
-#include <cstdint>                      // for std::uint_least32_t
 #include <random>                       // for std::mt19937
-#include <vector>                       // for std::vector
-#include <boost/range/algorithm.hpp>    // for boost::generate
 
 namespace myrandom {
     template <typename Distribution>
@@ -73,23 +70,24 @@ namespace myrandom {
 
         //! A private constructor (deleted).
         /*!
-        デフォルトコンストラクタ（禁止）
+			デフォルトコンストラクタ（禁止）
         */
         MyRand() = delete;
 
         //! A private copy constructor (deleted).
         /*!
             コピーコンストラクタ（禁止）
+    		\param dummy コピー元のオブジェクト（未使用）
         */
-        MyRand(const MyRand &) = delete;
+        MyRand(MyRand const & dummy) = delete;
 
         //! A private member function (deleted).
         /*!
             operator=()の宣言（禁止）
-            \param コピー元のオブジェクト（未使用）
+            \param dummy コピー元のオブジェクト（未使用）
             \return コピー元のオブジェクト
         */
-        MyRand & operator=(const MyRand &) = delete;
+        MyRand & operator=(MyRand const & dummy) = delete;
 
         // #endregion 禁止されたコンストラクタ・メンバ関数
     };

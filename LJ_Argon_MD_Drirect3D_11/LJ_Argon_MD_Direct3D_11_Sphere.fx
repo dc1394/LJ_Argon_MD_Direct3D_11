@@ -1,7 +1,7 @@
-//--------------------------------------------------------------------------------------
-// File: Tutorial09.fx
+﻿//--------------------------------------------------------------------------------------
+// LJ_Argon_MD_Direct3D_11_Sphere.fx
 //
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright © 2015 @dc1394 All Rights Reserved.
 //--------------------------------------------------------------------------------------
 
 
@@ -24,8 +24,8 @@ cbuffer cbChangesEveryFrame : register( b1 )
 
 struct VS_INPUT
 {
-    float3 Pos          : POSITION;         // position
-    float3 Norm         : NORMAL;           // normal
+    float3 Pos : POSITION;    // position
+    float3 Norm : NORMAL;     // normal
 };
 
 struct PS_INPUT
